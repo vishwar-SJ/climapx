@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClimapX — AI-Powered Climate Safety for India</title>
+  <meta name="description" content="AI-powered climate safety platform for India — air pollution, extreme heat, floods, wildfires, contaminated water & traffic-safe routing">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- ═══════════════ LOCATION GATE (mandatory) ═══════════════ -->
+  <div class="loc-gate" id="locGate">
+    <div class="loc-gate-card">
+      <div class="loc-gate-icon">🌍</div>
+      <h2>ClimapX Needs Your Location</h2>
+      <p>To show real-time air quality, weather, and safety data for your area, we need access to your location.</p>
+      <button class="loc-gate-btn" id="locGateBtn">
+        <span class="material-icons-round">my_location</span>
+        Allow Location Access
+      </button>
+      <p class="loc-gate-hint" id="locGateHint">Your location stays on your device. We never store or share it.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">�</div>
+      <div class="brand-text">
+        <h1>ClimapX</h1>
+        <span>Climate Safety</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-btn active" data-tab="dashboard">
+        <span class="material-icons-round">dashboard</span>
+        <span class="nav-label">Dashboard</span>
+      </button>
+      <button class="nav-btn" data-tab="map">
+        <span class="material-icons-round">map</span>
+        <span class="nav-label">Risk Map</span>
+      </button>
+      <button class="nav-btn" data-tab="journey">
+        <span class="material-icons-round">route</span>
+        <span class="nav-label">Journey</span>
+      </button>
+      <button class="nav-btn" data-tab="alerts">
+        <span class="material-icons-round">warning</span>
+        <span class="nav-label">Alerts</span>
+      </button>
+      <button class="nav-btn" data-tab="settings">
+        <span class="material-icons-round">settings</span>
+        <span class="nav-label">Settings</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="live-indicator">
+        <span class="live-dot"></span>
+        <span id="sidebarStatus">Connecting...</span>
+      </div>
+      <div class="sidebar-version">v1.0.0</div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════ MOBILE NAV ═══════════════════════ -->
+  <nav class="mobile-nav" id="mobileNav">
+    <button class="mob-btn active" data-tab="dashboard"><span class="material-icons-round">dashboard</span><span>Home</span></button>
+    <button class="mob-btn" data-tab="map"><span class="material-icons-round">map</span><span>Map</span></button>
+    <button class="mob-btn" data-tab="journey"><span class="material-icons-round">route</span><span>Journey</span></button>
+    <button class="mob-btn" data-tab="alerts"><span class="material-icons-round">warning</span><span>Alerts</span></button>
+    <button class="mob-btn" data-tab="settings"><span class="material-icons-round">settings</span><span>More</span></button>
+  </nav>
+
+  <!-- ═══════════════════════ MAIN CONTENT ═══════════════════════ -->
+  <main class="main" id="main">
+    <!-- ──── HEADER BAR ──── -->
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle">
+        <span class="material-icons-round">menu</span>
+      </button>
+      <div class="topbar-title">
+        <h2 id="pageTitle">Dashboard</h2>
+        <span class="topbar-subtitle" id="pageSubtitle">Real-time climate overview</span>
+      </div>
+      <div class="topbar-actions">
+        <div class="location-badge" id="locationBadge">
+          <span class="material-icons-round">location_on</span>
+          <span id="locationText">Detecting...</span>
+        </div>
+        <button class="icon-btn" id="refreshBtn" title="Refresh data">
+          <span class="material-icons-round">refresh</span>
+        </button>
+        <button class="icon-btn" id="themeToggle" title="Toggle theme">
+          <span class="material-icons-round">dark_mode</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ════════════════════ DASHBOARD TAB ════════════════════ -->
+    <section class="tab-content active" id="tab-dashboard">
+      <!-- Alert Banner -->
+      <div class="alert-banner" id="alertBanner" style="display:none">
+        <span class="material-icons-round">emergency</span>
+        <div class="alert-banner-text">
+          <strong id="alertBannerTitle">Emergency Alert</strong>
+          <span id="alertBannerDesc">Loading...</span>
+        </div>
+        <button class="alert-dismiss" id="alertDismiss">×</button>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card aqi-card" id="aqiCard">
+          <div class="stat-icon-wrap aqi-icon"><span class="material-icons-round">air</span></div>
+          <div class="stat-info">
+            <span class="stat-label">Air Quality Index</span>
+            <span class="stat-value" id="aqiValue">--</span>
+            <span class="stat-sub" id="aqiCategory">Loading...</span>
+            <div class="pollutant-pills" id="pollutantPills"></div>
+            <div class="aqi-station-info" id="aqiStationInfo"><span class="material-icons-round" style="font-size:13px">sensors</span> <span id="aqiStation">--</span></div>
+          </div>
+          <div class="aqi-gauge" id="aqiGauge">
+            <svg viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="8"/>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--risk-good)" stroke-width="8" 
+                stroke-dasharray="327" stroke-dashoffset="327" stroke-linecap="round"
+                id="aqiArc" transform="rotate(-90 60 60)"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="stat-card weather-card" id="weatherCard">
+          <div class="stat-icon-wrap weather-icon"><img id="weatherIcon" src="https://openweathermap.org/img/wn/01d@2x.png" alt="Weather" style="width:48px;height:48px;border-radius:12px"></div>
+          <div class="stat-info">
+            <span class="stat-label">Temperature</span>
+            <span class="stat-value" id="tempValue">--°C</span>
+            <span class="stat-sub" id="weatherDesc">Loading...</span>
+            <span class="stat-sub" id="feelsLike" style="font-size:0.7rem;color:var(--text-muted)"></span>
+          </div>
+          <div class="weather-extra">
+            <div class="wx-chip"><span class="material-icons-round">water_drop</span><span id="humidityVal">--%</span></div>
+            <div class="wx-chip"><span class="material-icons-round">air</span><span id="windVal">-- m/s</span></div>
+            <div class="wx-chip"><span class="material-icons-round">umbrella</span><span id="rainVal">0 mm</span></div>
+          </div>
+        </div>
+
+        <div class="stat-card score-card" id="scoreCard">
+          <div class="score-top">
+            <div class="stat-icon-wrap score-icon"><span class="material-icons-round">shield</span></div>
+            <div class="stat-info">
+              <span class="stat-label">AI Exposure Score</span>
+              <span class="stat-value" id="scoreValue">--</span>
+              <span class="stat-sub" id="scoreLevel">Loading...</span>
+            </div>
+          </div>
+          <div class="score-bars">
+            <div class="score-bar-item"><span>Pollution</span><div class="mini-bar"><div class="mini-fill" id="pollBar"></div></div></div>
+            <div class="score-bar-item"><span>Heat</span><div class="mini-bar"><div class="mini-fill heat" id="heatBar"></div></div></div>
+            <div class="score-bar-item"><span>Flood</span><div class="mini-bar"><div class="mini-fill flood" id="floodBar"></div></div></div>
+          </div>
+          <div class="ai-advice" id="aiAdvice"></div>
+        </div>
+      </div>
+
+      <!-- Journey Planner CTA -->
+      <div class="journey-cta" id="journeyCta">
+        <div class="cta-content">
+          <div class="cta-icon"><span class="material-icons-round">route</span></div>
+          <div class="cta-text">
+            <h3>Plan Safe Journey</h3>
+            <p>AI-optimized routes avoiding pollution, heat, floods & traffic</p>
+          </div>
+          <span class="material-icons-round cta-arrow">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- Journey Advisory -->
+      <div class="advisory-card" id="advisoryCard">
+        <div class="advisory-header">
+          <span class="material-icons-round">psychology</span>
+          <h3>AI Safety Advisor</h3>
+        </div>
+        <div class="advisory-body" id="advisoryBody">
+          <p class="advisory-text" id="advisoryText">Loading advisory...</p>
+          <div class="advisory-chips" id="advisoryChips"></div>
+        </div>
+      </div>
+
+      <!-- AQI Comparison Row -->
+      <div class="section-header">
+        <h3>🏙️ Major Cities AQI</h3>
+        <span class="section-sub">Real-time comparison</span>
+      </div>
+      <div class="cities-grid" id="citiesGrid">
+        <!-- Dynamically populated -->
+      </div>
+
+      <!-- Health Tips -->
+      <div class="section-header">
+        <h3>💡 Health Recommendations</h3>
+      </div>
+      <div class="tips-grid" id="tipsGrid"></div>
+    </section>
+
+    <!-- ════════════════════ MAP TAB ════════════════════ -->
+    <section class="tab-content" id="tab-map">
+      <div class="map-container">
+        <div id="googleMap" class="google-map"></div>
+        <!-- Overlay Toggles -->
+        <div class="map-controls">
+          <button class="map-ctrl" id="toggleAqi" title="Air Quality Overlay">
+            <span class="material-icons-round">air</span>
+          </button>
+          <button class="map-ctrl" id="toggleHeat" title="Heat Overlay">
+            <span class="material-icons-round">whatshot</span>
+          </button>
+          <button class="map-ctrl" id="toggleFlood" title="Flood Overlay">
+            <span class="material-icons-round">water</span>
+          </button>
+          <button class="map-ctrl" id="toggleMyLoc" title="My Location">
+            <span class="material-icons-round">my_location</span>
+          </button>
+          <button class="map-ctrl" id="toggleMapType" title="Toggle Satellite">
+            <span class="material-icons-round">layers</span>
+          </button>
+        </div>
+        <!-- Legend -->
+        <div class="map-legend" id="mapLegend"></div>
+        <!-- Bottom Info -->
+        <div class="map-bottom-info" id="mapBottomInfo">
+          <div class="map-info-score">
+            <span class="map-score-num" id="mapScoreNum">--</span>
+          </div>
+          <div class="map-info-text">
+            <strong id="mapExposureLabel">Exposure: --</strong>
+            <span id="mapExposureTip">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════ JOURNEY TAB ════════════════════ -->
+    <section class="tab-content" id="tab-journey">
+      <div class="journey-layout">
+        <!-- Search Panel -->
+        <div class="journey-panel">
+          <div class="search-box">
+            <div class="search-origin">
+              <div class="search-dot origin-dot"></div>
+              <span>Your Location</span>
+            </div>
+            <div class="search-connector"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="search-dest">
+              <div class="search-dot dest-dot"></div>
+              <input type="text" id="destInput" placeholder="Enter destination..." autocomplete="off">
+              <button class="clear-btn" id="clearDest" style="display:none">
+                <span class="material-icons-round">close</span>
+              </button>
+            </div>
+            <div class="suggestions-dropdown" id="suggestions" style="display:none"></div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="jtabs" id="jTabs" style="display:none">
+            <button class="jtab active" data-jtab="routes">🛣️ Routes</button>
+            <button class="jtab" data-jtab="besttime">⏰ Best Time</button>
+          </div>
+
+          <!-- Routes Content -->
+          <div class="jtab-content active" id="jcontent-routes">
+            <div class="journey-empty" id="journeyEmpty">
+              <div class="empty-icon">🗺️</div>
+              <h3>Plan a Safe Journey</h3>
+              <p>Enter a destination to get pollution-optimized routes and the best departure time.</p>
+              <div class="feature-chips">
+                <span class="fchip"><span class="material-icons-round">air</span> AQI-aware</span>
+                <span class="fchip"><span class="material-icons-round">schedule</span> Best time</span>
+                <span class="fchip"><span class="material-icons-round">thermostat</span> Heat check</span>
+                <span class="fchip"><span class="material-icons-round">water</span> Flood avoid</span>
+                <span class="fchip"><span class="material-icons-round">traffic</span> Traffic safe</span>
+              </div>
+            </div>
+            <div class="journey-loading" id="routesLoading" style="display:none">
+              <div class="spinner"></div>
+              <p>Analyzing routes for pollution & safety...</p>
+            </div>
+            <div class="routes-list" id="routesList" style="display:none"></div>
+          </div>
+
+          <!-- Best Time Content -->
+          <div class="jtab-content" id="jcontent-besttime">
+            <div class="journey-loading" id="timesLoading" style="display:none">
+              <div class="spinner"></div>
+              <p>Analyzing weather & pollution patterns...</p>
+            </div>
+            <div class="times-content" id="timesContent" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- Journey Map -->
+        <div class="journey-map-wrap">
+          <div id="journeyMap" class="journey-map"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════ ALERTS TAB ════════════════════ -->
+    <section class="tab-content" id="tab-alerts">
+      <div class="alerts-header">
+        <div class="alerts-summary" id="alertsSummary">
+          <div class="alerts-count" id="alertsCount">0</div>
+          <span>Active Alerts</span>
+        </div>
+        <button class="btn-refresh" id="refreshAlerts">
+          <span class="material-icons-round">refresh</span> Refresh
+        </button>
+      </div>
+      <div class="alerts-filters">
+        <button class="filter-chip active" data-filter="all">All</button>
+        <button class="filter-chip" data-filter="pollution">🌫️ Pollution</button>
+        <button class="filter-chip" data-filter="flood">🌊 Flood</button>
+        <button class="filter-chip" data-filter="wildfire">🔥 Wildfire</button>
+        <button class="filter-chip" data-filter="heatwave">🌡️ Heat</button>
+        <button class="filter-chip" data-filter="cyclone">🌀 Cyclone</button>
+      </div>
+      <div class="alerts-list" id="alertsList">
+        <div class="empty-state">
+          <span class="material-icons-round">verified_user</span>
+          <h3>No Active Alerts</h3>
+          <p>Your area is currently safe. We'll notify you if any hazard is detected.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════ SETTINGS TAB ════════════════════ -->
+    <section class="tab-content" id="tab-settings">
+      <div class="settings-grid">
+        <div class="settings-section">
+          <h3><span class="material-icons-round">palette</span> Appearance</h3>
+          <div class="setting-row">
+            <div class="setting-info"><strong>Dark Mode</strong><span>Switch between light and dark theme</span></div>
+            <label class="toggle"><input type="checkbox" id="darkToggle"><span class="slider"></span></label>
+          </div>
+        </div>
+
+
+
+        <div class="settings-section">
+          <h3><span class="material-icons-round">info</span> About ClimapX</h3>
+          <div class="about-card">
+            <div class="about-brand">🌍 <strong>ClimapX</strong> v1.0.0</div>
+            <p>AI-powered climate safety platform for India. Continuously monitors air pollution, extreme heat, floods, wildfires, contaminated water & heavy traffic to protect your daily life, travel, and emergencies.</p>
+            <div class="about-chips">
+              <span class="achip">Air Quality</span>
+              <span class="achip">Heatwave</span>
+              <span class="achip">Flood Risk</span>
+              <span class="achip">Wildfire</span>
+              <span class="achip">Water Quality</span>
+              <span class="achip">Traffic Safety</span>
+              <span class="achip">Safe Routing</span>
+              <span class="achip">AI Exposure Score</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/app.js"></script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrTsOTHbwYVf4_MYVAkr8ERoB86-HJMB8&libraries=places&callback=initMaps">
+  </script>
+</body>
+</html>
